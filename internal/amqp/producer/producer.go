@@ -55,7 +55,7 @@ func (p *Producer) Publish(message AMQPMessage) error {
 			return fmt.Errorf("cannot marshall message, %w", err)
 		}
 
-		p.channel.Publish(
+		err = p.channel.Publish(
 			"",     // exchange
 			p.name, // routing key
 			false,  // mandatory
@@ -64,6 +64,9 @@ func (p *Producer) Publish(message AMQPMessage) error {
 				ContentType: "text/plain",
 				Body:        bytes,
 			})
+		if err != nil {
+			return fmt.Errorf("cannot publish message, %w", err)
+		}
 
 		return nil
 	}
