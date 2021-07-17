@@ -1,0 +1,77 @@
+version: '3.7'
+
+networks:
+  rabbit:
+    driver: bridge
+  postgres:
+    driver: bridge
+  banners-rotation:
+    driver: bridge
+
+services:
+  integration_tests:
+    build: tests
+    command: 'true'
+    environment:
+      TESTS_AMQP_DSN: 'amqp://guest:guest@rabbit:5672/'
+      TESTS_POSTGRES_DSN: 'host=postgres port=5432 user=postgres password=example dbname=postgres sslmode=disable'
+      TESTS_HTTP_HOST: 'http://banners-rotation:5555'
+      WAIT_HOSTS: postgres:5432, rabbit:5672, banners-rotation:5555
+    depends_on: 
+      - banners-rotation
+    links:
+      - banners-rotation
+    networks:
+      - rabbit
+      - postgres
+      - banners-rotation
+
+  postgres:
+    image: postgres
+    hostname: postgres
+    container_name: postgres_test
+    expose:
+      - 5432
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: postgres
+    volumes:
+      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - postgres
+
+  rabbit:
+    image: rabbitmq:3.7.17-management
+    hostname: rabbit
+    container_name: rabbit_test
+    expose:
+      - 15672
+    restart: always
+    volumes:
+      - ./configs/rabbit.def.json:/etc/rabbitmq/definitions.json:ro
+      - ./configs/rabbit.config:/etc/rabbitmq/rabbitmq.config:ro
+    networks:
+      - rabbit
+
+  banners-rotation:
+    build:
+      context: .
+      dockerfile: ./cmd/banners-rotation/Dockerfile
+      args:
+        - CONFIG_FILE_NAME=config.test
+    hostname: banners-rotation
+    container_name: banners-rotation_test
+    depends_on:
+      - rabbit
+      - postgres
+    restart: on-failure
+    environment:
+      - WAIT_HOSTS=postgres:5432, rabbit:5672
+    volumes:
+      - ./logs/containers/:/logs/
+    networks:
+      - banners-rotation
+      - rabbit
+      - postgres

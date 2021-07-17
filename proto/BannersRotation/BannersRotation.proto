@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package event;
+
+import "google/api/annotations.proto";
+
+option go_package = "./;pb";
+
+message Message {
+    string message = 1;
+}
+
+message AddBannerBody {
+  string ID =1;
+  string slot = 2;
+}
+
+service BannersRotation {
+    rpc AddBanner(AddBannerBody) returns (Message) {
+        option (google.api.http) = {
+            post: "/banners/add"
+            body: "*"
+          };
+    }
+}
