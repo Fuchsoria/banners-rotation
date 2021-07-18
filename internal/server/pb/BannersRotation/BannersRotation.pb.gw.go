@@ -168,7 +168,7 @@ func local_request_BannersRotation_GetBanner_0(ctx context.Context, marshaler ru
 }
 
 func request_BannersRotation_CreateBanner_0(ctx context.Context, marshaler runtime.Marshaler, client BannersRotationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Banner
+	var protoReq BannerRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -185,7 +185,7 @@ func request_BannersRotation_CreateBanner_0(ctx context.Context, marshaler runti
 }
 
 func local_request_BannersRotation_CreateBanner_0(ctx context.Context, marshaler runtime.Marshaler, server BannersRotationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Banner
+	var protoReq BannerRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -202,7 +202,7 @@ func local_request_BannersRotation_CreateBanner_0(ctx context.Context, marshaler
 }
 
 func request_BannersRotation_CreateSlot_0(ctx context.Context, marshaler runtime.Marshaler, client BannersRotationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Slot
+	var protoReq SlotRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -219,7 +219,7 @@ func request_BannersRotation_CreateSlot_0(ctx context.Context, marshaler runtime
 }
 
 func local_request_BannersRotation_CreateSlot_0(ctx context.Context, marshaler runtime.Marshaler, server BannersRotationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Slot
+	var protoReq SlotRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -236,7 +236,7 @@ func local_request_BannersRotation_CreateSlot_0(ctx context.Context, marshaler r
 }
 
 func request_BannersRotation_CreateSocialDemo_0(ctx context.Context, marshaler runtime.Marshaler, client BannersRotationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SocialDemo
+	var protoReq SocialDemoRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -253,7 +253,7 @@ func request_BannersRotation_CreateSocialDemo_0(ctx context.Context, marshaler r
 }
 
 func local_request_BannersRotation_CreateSocialDemo_0(ctx context.Context, marshaler runtime.Marshaler, server BannersRotationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SocialDemo
+	var protoReq SocialDemoRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/Fuchsoria/banners-rotation/internal/app"
 	gw "github.com/Fuchsoria/banners-rotation/internal/server/pb/BannersRotation"
+	"github.com/google/uuid"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -111,11 +112,68 @@ func (s *Server) Stop(ctx context.Context) error {
 
 func (s *grpcserver) AddBanner(ctx context.Context, in *gw.AddBannerRequest) (*gw.MessageResponse, error) {
 	if in.BannerId == "" || in.SlotId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "cannot add banner, %s", ErrBadRequest)
+		return nil, status.Errorf(codes.InvalidArgument, "cannot add banner in rotation, %s", ErrBadRequest)
 	}
 
-	s.app.GetLogger().Info(in.BannerId)
-	s.app.GetLogger().Info(in.SlotId)
+	return &gw.MessageResponse{Message: "added"}, nil
+}
 
-	return &gw.MessageResponse{Message: "created"}, nil
+func (s *grpcserver) RemoveBanner(ctx context.Context, in *gw.RemoveBannerRequest) (*gw.MessageResponse, error) {
+	if in.BannerId == "" || in.SlotId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "cannot remove banner from rotation, %s", ErrBadRequest)
+	}
+
+	return &gw.MessageResponse{Message: "removed"}, nil
+}
+
+func (s *grpcserver) ClickEvent(ctx context.Context, in *gw.ClickEventRequest) (*gw.MessageResponse, error) {
+	if in.BannerId == "" || in.SlotId == "" || in.SocialDemoId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "cannot click on banner, %s", ErrBadRequest)
+	}
+
+	return &gw.MessageResponse{Message: "clicked"}, nil
+}
+
+func (s *grpcserver) GetBanner(ctx context.Context, in *gw.GetBannerRequest) (*gw.BannerResponse, error) {
+	if in.SlotId == "" || in.SocialDemoId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "cannot get banner, %s", ErrBadRequest)
+	}
+
+	return &gw.BannerResponse{Id: "test id"}, nil
+}
+
+func (s *grpcserver) CreateBanner(ctx context.Context, in *gw.BannerRequest) (*gw.BannerResponse, error) {
+	id := in.Id
+
+	if id == "" {
+		id = uuid.New().String()
+	}
+
+	//in.Description
+
+	return &gw.BannerResponse{Id: id}, nil
+}
+
+func (s *grpcserver) CreateSlot(ctx context.Context, in *gw.SlotRequest) (*gw.SlotResponse, error) {
+	id := in.Id
+
+	if id == "" {
+		id = uuid.New().String()
+	}
+
+	// in.Description
+
+	return &gw.SlotResponse{Id: id}, nil
+}
+
+func (s *grpcserver) CreateSocialDemo(ctx context.Context, in *gw.SocialDemoRequest) (*gw.SocialDemoResponse, error) {
+	id := in.Id
+
+	if id == "" {
+		id = uuid.New().String()
+	}
+
+	// in.Description
+
+	return &gw.SocialDemoResponse{Id: id}, nil
 }

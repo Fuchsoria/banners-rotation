@@ -6,25 +6,33 @@ import "google/api/annotations.proto";
 
 option go_package = "./;pb";
 
-message BannerResponse {
-  string id = 1;
-}
-
 message MessageResponse {
   string message = 1;
 }
 
-message Slot {
+message BannerResponse {
+  string id = 1;
+}
+
+message SlotResponse {
+  string id = 1;
+}
+
+message SocialDemoResponse {
+  string id = 1;
+}
+
+message SlotRequest {
   string id = 1;
   string description = 2;
 }
 
-message Banner {
+message BannerRequest {
   string id = 1;
   string description = 2;
 }
 
-message SocialDemo {
+message SocialDemoRequest {
   string id = 1;
   string description = 2;
 }
@@ -75,19 +83,19 @@ service BannersRotation {
       body: "*"
     };
   }
-  rpc CreateBanner(Banner) returns (MessageResponse) {
+  rpc CreateBanner(BannerRequest) returns (BannerResponse) {
     option (google.api.http) = {
       post: "/api/v1/admin/banners/create"
       body: "*"
     };
   }
-  rpc CreateSlot(Slot) returns (MessageResponse) {
+  rpc CreateSlot(SlotRequest) returns (SlotResponse) {
     option (google.api.http) = {
       post: "/api/v1/admin/slots/create"
       body: "*"
     };
   }
-  rpc CreateSocialDemo(SocialDemo) returns (MessageResponse) {
+  rpc CreateSocialDemo(SocialDemoRequest) returns (SocialDemoResponse) {
     option (google.api.http) = {
       post: "/api/v1/admin/social-demos/create"
       body: "*"

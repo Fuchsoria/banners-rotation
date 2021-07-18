@@ -7,9 +7,6 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/banners-rotation
 
-run: build
-	$(BIN) -config ./configs/config.json
-
 build-img:
 	docker build \
 		--build-arg=LDFLAGS="$(LDFLAGS)" \
@@ -47,16 +44,19 @@ generate-gateway: generate
 			--grpc-gateway_opt generate_unbound_methods=true \
 			proto/BannersRotation/*.proto
 
-up:
+build-container:
+	docker-compose build --no-cache
+
+run:
 	docker-compose up -d
 
-upl:
-	docker-compose up
-
-down:
+stop:
 	docker-compose down
 
-rebuild:
+rebuild: build-container
+	docker-compose up
+
+up:
 	docker-compose up --build
 
 integration-tests-cleanup:
@@ -75,4 +75,4 @@ integration-tests:
 	docker-compose -f docker-compose.test.yaml down ;\
 	exit $$test_status_code ;
 
-.PHONY: build run build-img run-img version test lint install-lint-deps generate-deps generate generate-gateway up upl down rebuild integration-tests-cleanup integration-tests
+.PHONY: build build-img run-img version test lint install-lint-deps generate-deps generate generate-gateway upl run stop rebuild integration-tests-cleanup integration-tests
