@@ -18,7 +18,13 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BannersRotationClient interface {
-	AddBanner(ctx context.Context, in *AddBannerBody, opts ...grpc.CallOption) (*Message, error)
+	AddBanner(ctx context.Context, in *AddBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	RemoveBanner(ctx context.Context, in *RemoveBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	ClickEvent(ctx context.Context, in *ClickEventRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	GetBanner(ctx context.Context, in *GetBannerRequest, opts ...grpc.CallOption) (*BannerResponse, error)
+	CreateBanner(ctx context.Context, in *Banner, opts ...grpc.CallOption) (*MessageResponse, error)
+	CreateSlot(ctx context.Context, in *Slot, opts ...grpc.CallOption) (*MessageResponse, error)
+	CreateSocialDemo(ctx context.Context, in *SocialDemo, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type bannersRotationClient struct {
@@ -29,9 +35,63 @@ func NewBannersRotationClient(cc grpc.ClientConnInterface) BannersRotationClient
 	return &bannersRotationClient{cc}
 }
 
-func (c *bannersRotationClient) AddBanner(ctx context.Context, in *AddBannerBody, opts ...grpc.CallOption) (*Message, error) {
-	out := new(Message)
-	err := c.cc.Invoke(ctx, "/event.BannersRotation/AddBanner", in, out, opts...)
+func (c *bannersRotationClient) AddBanner(ctx context.Context, in *AddBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/AddBanner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) RemoveBanner(ctx context.Context, in *RemoveBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/RemoveBanner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) ClickEvent(ctx context.Context, in *ClickEventRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/ClickEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) GetBanner(ctx context.Context, in *GetBannerRequest, opts ...grpc.CallOption) (*BannerResponse, error) {
+	out := new(BannerResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/GetBanner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) CreateBanner(ctx context.Context, in *Banner, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateBanner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) CreateSlot(ctx context.Context, in *Slot, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateSlot", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bannersRotationClient) CreateSocialDemo(ctx context.Context, in *SocialDemo, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateSocialDemo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +102,13 @@ func (c *bannersRotationClient) AddBanner(ctx context.Context, in *AddBannerBody
 // All implementations must embed UnimplementedBannersRotationServer
 // for forward compatibility
 type BannersRotationServer interface {
-	AddBanner(context.Context, *AddBannerBody) (*Message, error)
+	AddBanner(context.Context, *AddBannerRequest) (*MessageResponse, error)
+	RemoveBanner(context.Context, *RemoveBannerRequest) (*MessageResponse, error)
+	ClickEvent(context.Context, *ClickEventRequest) (*MessageResponse, error)
+	GetBanner(context.Context, *GetBannerRequest) (*BannerResponse, error)
+	CreateBanner(context.Context, *Banner) (*MessageResponse, error)
+	CreateSlot(context.Context, *Slot) (*MessageResponse, error)
+	CreateSocialDemo(context.Context, *SocialDemo) (*MessageResponse, error)
 	mustEmbedUnimplementedBannersRotationServer()
 }
 
@@ -50,8 +116,26 @@ type BannersRotationServer interface {
 type UnimplementedBannersRotationServer struct {
 }
 
-func (UnimplementedBannersRotationServer) AddBanner(context.Context, *AddBannerBody) (*Message, error) {
+func (UnimplementedBannersRotationServer) AddBanner(context.Context, *AddBannerRequest) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddBanner not implemented")
+}
+func (UnimplementedBannersRotationServer) RemoveBanner(context.Context, *RemoveBannerRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveBanner not implemented")
+}
+func (UnimplementedBannersRotationServer) ClickEvent(context.Context, *ClickEventRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClickEvent not implemented")
+}
+func (UnimplementedBannersRotationServer) GetBanner(context.Context, *GetBannerRequest) (*BannerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBanner not implemented")
+}
+func (UnimplementedBannersRotationServer) CreateBanner(context.Context, *Banner) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateBanner not implemented")
+}
+func (UnimplementedBannersRotationServer) CreateSlot(context.Context, *Slot) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSlot not implemented")
+}
+func (UnimplementedBannersRotationServer) CreateSocialDemo(context.Context, *SocialDemo) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSocialDemo not implemented")
 }
 func (UnimplementedBannersRotationServer) mustEmbedUnimplementedBannersRotationServer() {}
 
@@ -67,7 +151,7 @@ func RegisterBannersRotationServer(s grpc.ServiceRegistrar, srv BannersRotationS
 }
 
 func _BannersRotation_AddBanner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddBannerBody)
+	in := new(AddBannerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -76,10 +160,118 @@ func _BannersRotation_AddBanner_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/event.BannersRotation/AddBanner",
+		FullMethod: "/BannersRotation.BannersRotation/AddBanner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BannersRotationServer).AddBanner(ctx, req.(*AddBannerBody))
+		return srv.(BannersRotationServer).AddBanner(ctx, req.(*AddBannerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_RemoveBanner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveBannerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).RemoveBanner(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/RemoveBanner",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).RemoveBanner(ctx, req.(*RemoveBannerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_ClickEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClickEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).ClickEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/ClickEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).ClickEvent(ctx, req.(*ClickEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_GetBanner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBannerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).GetBanner(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/GetBanner",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).GetBanner(ctx, req.(*GetBannerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_CreateBanner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Banner)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).CreateBanner(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/CreateBanner",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).CreateBanner(ctx, req.(*Banner))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_CreateSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Slot)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).CreateSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/CreateSlot",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).CreateSlot(ctx, req.(*Slot))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BannersRotation_CreateSocialDemo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SocialDemo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BannersRotationServer).CreateSocialDemo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BannersRotation.BannersRotation/CreateSocialDemo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BannersRotationServer).CreateSocialDemo(ctx, req.(*SocialDemo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -88,12 +280,36 @@ func _BannersRotation_AddBanner_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BannersRotation_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "event.BannersRotation",
+	ServiceName: "BannersRotation.BannersRotation",
 	HandlerType: (*BannersRotationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "AddBanner",
 			Handler:    _BannersRotation_AddBanner_Handler,
+		},
+		{
+			MethodName: "RemoveBanner",
+			Handler:    _BannersRotation_RemoveBanner_Handler,
+		},
+		{
+			MethodName: "ClickEvent",
+			Handler:    _BannersRotation_ClickEvent_Handler,
+		},
+		{
+			MethodName: "GetBanner",
+			Handler:    _BannersRotation_GetBanner_Handler,
+		},
+		{
+			MethodName: "CreateBanner",
+			Handler:    _BannersRotation_CreateBanner_Handler,
+		},
+		{
+			MethodName: "CreateSlot",
+			Handler:    _BannersRotation_CreateSlot_Handler,
+		},
+		{
+			MethodName: "CreateSocialDemo",
+			Handler:    _BannersRotation_CreateSocialDemo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,25 +1,96 @@
 syntax = "proto3";
 
-package event;
+package BannersRotation;
 
 import "google/api/annotations.proto";
 
 option go_package = "./;pb";
 
-message Message {
-    string message = 1;
+message BannerResponse {
+  string id = 1;
 }
 
-message AddBannerBody {
-  string ID =1;
-  string slot = 2;
+message MessageResponse {
+  string message = 1;
+}
+
+message Slot {
+  string id = 1;
+  string description = 2;
+}
+
+message Banner {
+  string id = 1;
+  string description = 2;
+}
+
+message SocialDemo {
+  string id = 1;
+  string description = 2;
+}
+
+message AddBannerRequest {
+  string banner_id = 1;
+  string slot_id = 2;
+}
+
+message RemoveBannerRequest {
+  string slot_id = 1;
+  string banner_id = 2;
+}
+
+message ClickEventRequest {
+  string slot_id = 1;
+  string banner_id = 2;
+  string social_demo_id = 3;
+}
+
+message GetBannerRequest {
+  string slot_id = 1;
+  string social_demo_id = 2;
 }
 
 service BannersRotation {
-    rpc AddBanner(AddBannerBody) returns (Message) {
-        option (google.api.http) = {
-            post: "/banners/add"
-            body: "*"
-          };
-    }
+  rpc AddBanner(AddBannerRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/add"
+      body: "*"
+    };
+  }
+  rpc RemoveBanner(RemoveBannerRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/remove"
+      body: "*"
+    };
+  }
+  rpc ClickEvent(ClickEventRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/click"
+      body: "*"
+    };
+  }
+  rpc GetBanner(GetBannerRequest) returns (BannerResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/get"
+      body: "*"
+    };
+  }
+  rpc CreateBanner(Banner) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/banners/create"
+      body: "*"
+    };
+  }
+  rpc CreateSlot(Slot) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/slots/create"
+      body: "*"
+    };
+  }
+  rpc CreateSocialDemo(SocialDemo) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/social-demos/create"
+      body: "*"
+    };
+  }
 }

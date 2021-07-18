@@ -15,6 +15,7 @@ import (
 	gw "github.com/Fuchsoria/banners-rotation/internal/server/grpc"
 	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
 	"github.com/Fuchsoria/banners-rotation/internal/version"
+	_ "github.com/lib/pq"
 )
 
 var (

@@ -14,6 +14,8 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -105,4 +107,15 @@ func (s *Server) Stop(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s *grpcserver) AddBanner(ctx context.Context, in *gw.AddBannerRequest) (*gw.MessageResponse, error) {
+	if in.BannerId == "" || in.SlotId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "cannot add banner, %s", ErrBadRequest)
+	}
+
+	s.app.GetLogger().Info(in.BannerId)
+	s.app.GetLogger().Info(in.SlotId)
+
+	return &gw.MessageResponse{Message: "created"}, nil
 }

@@ -6,6 +6,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
 	github.com/jmoiron/sqlx v1.3.4
+	github.com/lib/pq v1.2.0
 	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
 	go.uber.org/zap v1.17.0
