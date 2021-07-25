@@ -44,7 +44,10 @@ generate-gateway: generate
 			--grpc-gateway_opt generate_unbound_methods=true \
 			proto/BannersRotation/*.proto
 
-build-container:
+dev-build-container:
+	docker rm --force banners-rotation-br
+	docker rm --force postgres-br
+	docker rm --force rabbit-br
 	docker-compose build --no-cache
 
 run:
@@ -53,7 +56,7 @@ run:
 stop:
 	docker-compose down
 
-rebuild: build-container
+dev: dev-build-container
 	docker-compose up
 
 up:
@@ -75,4 +78,4 @@ integration-tests:
 	docker-compose -f docker-compose.test.yaml down ;\
 	exit $$test_status_code ;
 
-.PHONY: build build-img run-img version test lint install-lint-deps generate-deps generate generate-gateway upl run stop rebuild integration-tests-cleanup integration-tests
+.PHONY: build build-img run-img version test lint install-lint-deps generate-deps generate generate-gateway upl run stop dev integration-tests-cleanup integration-tests

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Fuchsoria/banners-rotation/internal/app"
+	"github.com/Fuchsoria/banners-rotation/internal/bandit"
 	"github.com/Fuchsoria/banners-rotation/internal/logger"
 	gw "github.com/Fuchsoria/banners-rotation/internal/server/grpc"
 	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
@@ -44,7 +45,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	storage, err := connectStorage(ctx, config)
+	storage, err := initStorage(ctx, config)
 	if err != nil {
 		logg.Error(err.Error())
 
@@ -90,8 +91,10 @@ func main() {
 	}
 }
 
-func connectStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error) {
-	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString)
+func initStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error) {
+	bandit := bandit.New()
+
+	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, bandit)
 	if err != nil {
 		return nil, fmt.Errorf("can't create new storage instance, %w", err)
 	}
@@ -99,6 +102,16 @@ func connectStorage(ctx context.Context, config Config) (*sqlstorage.Storage, er
 	err = storage.Connect(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to storage, %w", err)
+	}
+
+	err = storage.ClearSessionClicks()
+	if err != nil {
+		return nil, fmt.Errorf("cannot clear session clicks table, %w", err)
+	}
+
+	err = storage.ClearSessionViews()
+	if err != nil {
+		return nil, fmt.Errorf("cannot clear session views table, %w", err)
 	}
 
 	return storage, nil

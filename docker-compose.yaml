@@ -10,7 +10,7 @@ services:
   postgres:
     image: postgres
     hostname: postgres
-    container_name: postgres
+    container_name: postgres-br
     ports:
       - '5432:5432'
     expose:
@@ -21,14 +21,14 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: banners-rotation
     volumes:
-      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migrations/init_with_data.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - postgres
 
   rabbit:
     image: rabbitmq:3.7.17-management
     hostname: rabbit
-    container_name: rabbit
+    container_name: rabbit-br
     ports:
       - '15672:15672'
       - '5672:5672'
@@ -47,7 +47,7 @@ services:
       dockerfile: ./cmd/banners-rotation/Dockerfile
       args:
         - CONFIG_FILE_NAME=config
-    container_name: banners-rotation
+    container_name: banners-rotation-br
     depends_on:
       - rabbit
       - postgres
