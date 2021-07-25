@@ -11,7 +11,11 @@ import (
 var errPublish = errors.New("cannot publish message because channel isn't declared")
 
 type AMQPMessage struct {
-	Test string `json:"test"`
+	Type         string `json:"type"`
+	SlotID       string `json:"slot_id"`
+	BannerID     string `json:"banner_id"`
+	SocialDemoID string `json:"social_demo_id"`
+	Date         string `json:"date"`
 }
 
 type RMQConnection interface {

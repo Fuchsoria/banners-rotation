@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
 	"github.com/Fuchsoria/banners-rotation/internal/app"
 	"github.com/Fuchsoria/banners-rotation/internal/bandit"
 	"github.com/Fuchsoria/banners-rotation/internal/logger"
@@ -17,6 +18,7 @@ import (
 	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
 	"github.com/Fuchsoria/banners-rotation/internal/version"
 	_ "github.com/lib/pq"
+	"github.com/streadway/amqp"
 )
 
 var (
@@ -92,9 +94,20 @@ func main() {
 }
 
 func initStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error) {
+	conn, err := amqp.Dial(config.AMPQ.URI)
+	if err != nil {
+		return nil, fmt.Errorf("cannot connect to amqp, %w", err)
+	}
+
+	producer := simpleproducer.New(config.AMPQ.Name, conn)
+	err = producer.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("cannot connect to amqp producer, %w", err)
+	}
+
 	bandit := bandit.New()
 
-	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, bandit)
+	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, bandit, producer)
 	if err != nil {
 		return nil, fmt.Errorf("can't create new storage instance, %w", err)
 	}

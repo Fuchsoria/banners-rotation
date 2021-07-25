@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -13,9 +14,14 @@ type Bandit interface {
 	Use(items []string, clicks map[string]int, views map[string]int) string
 }
 
+type Producer interface {
+	Publish(message simpleproducer.AMQPMessage) error
+}
+
 type Storage struct {
-	db     *sqlx.DB
-	bandit Bandit
+	db       *sqlx.DB
+	bandit   Bandit
+	producer Producer
 }
 
 type BannerRotationItem struct {
@@ -44,13 +50,13 @@ type NotViewedItem struct {
 
 var ErrBannersWereRemoved = errors.New("banners were not removed from rotation")
 
-func New(ctx context.Context, connectionString string, bandit Bandit) (*Storage, error) {
+func New(ctx context.Context, connectionString string, bandit Bandit, producer Producer) (*Storage, error) {
 	db, err := sqlx.ConnectContext(ctx, "postgres", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open db, %w", err)
 	}
 
-	return &Storage{db, bandit}, nil
+	return &Storage{db, bandit, producer}, nil
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
@@ -111,7 +117,13 @@ func (s *Storage) RemoveBannerRotation(bannerID string, slotID string) error {
 }
 
 func (s *Storage) AddSessionClickEvent(bannerID string, slotID string, socialDemoID string) error {
-	_, err := s.db.Exec("INSERT INTO session_clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, time.Now().String())
+	date := time.Now().String()
+	_, err := s.db.Exec("INSERT INTO session_clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
+	if err != nil {
+		return err
+	}
+
+	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "click", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
 	if err != nil {
 		return err
 	}
@@ -120,7 +132,13 @@ func (s *Storage) AddSessionClickEvent(bannerID string, slotID string, socialDem
 }
 
 func (s *Storage) AddSessionViewEvent(bannerID string, slotID string, socialDemoID string) error {
-	_, err := s.db.Exec("INSERT INTO session_views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, time.Now().String())
+	date := time.Now().String()
+	_, err := s.db.Exec("INSERT INTO session_views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
+	if err != nil {
+		return err
+	}
+
+	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "view", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
 	if err != nil {
 		return err
 	}
