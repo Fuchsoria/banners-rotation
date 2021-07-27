@@ -84,7 +84,7 @@ func (a *App) MapDataFromDB(
 		mappedBannersViews[view.BannerID]++
 	}
 
-	return banners, mappedBannersClicks, mappedBannersClicks
+	return banners, mappedBannersClicks, mappedBannersViews
 }
 func (a *App) GetBanner(slotID string, socialDemoID string) (string, error) {
 	notViewedBanners, err := a.storage.GetNotViewedBanners(slotID)
