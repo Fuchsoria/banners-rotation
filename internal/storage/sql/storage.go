@@ -7,12 +7,9 @@ import (
 	"time"
 
 	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
+	"github.com/Fuchsoria/banners-rotation/internal/storage"
 	"github.com/jmoiron/sqlx"
 )
-
-type Bandit interface {
-	Use(items []string, clicks map[string]int, views map[string]int) string
-}
 
 type Producer interface {
 	Publish(message simpleproducer.AMQPMessage) error
@@ -20,43 +17,18 @@ type Producer interface {
 
 type Storage struct {
 	db       *sqlx.DB
-	bandit   Bandit
 	producer Producer
-}
-
-type BannerRotationItem struct {
-	SlotID   string `db:"slot_id"`
-	BannerID string `db:"banner_id"`
-}
-
-type SessionClickItem struct {
-	SlotID       string `db:"slot_id"`
-	BannerID     string `db:"banner_id"`
-	SocialDemoID string `db:"social_demo_id"`
-	Date         string `db:"date"`
-}
-
-type SessionViewItem struct {
-	SlotID       string `db:"slot_id"`
-	BannerID     string `db:"banner_id"`
-	SocialDemoID string `db:"social_demo_id"`
-	Date         string `db:"date"`
-}
-
-type NotViewedItem struct {
-	SlotID   string `db:"slot_id"`
-	BannerID string `db:"banner_id"`
 }
 
 var ErrBannersWereRemoved = errors.New("banners were not removed from rotation")
 
-func New(ctx context.Context, connectionString string, bandit Bandit, producer Producer) (*Storage, error) {
+func New(ctx context.Context, connectionString string, producer Producer) (*Storage, error) {
 	db, err := sqlx.ConnectContext(ctx, "postgres", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open db, %w", err)
 	}
 
-	return &Storage{db, bandit, producer}, nil
+	return &Storage{db, producer}, nil
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
@@ -69,24 +41,6 @@ func (s *Storage) Connect(ctx context.Context) error {
 
 func (s *Storage) Close() error {
 	return s.db.Close()
-}
-
-func (s *Storage) ClearSessionClicks() error {
-	_, err := s.db.Exec("TRUNCATE TABLE session_clicks")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Storage) ClearSessionViews() error {
-	_, err := s.db.Exec("TRUNCATE TABLE session_views")
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (s *Storage) AddBannerRotation(bannerID string, slotID string) error {
@@ -116,9 +70,9 @@ func (s *Storage) RemoveBannerRotation(bannerID string, slotID string) error {
 	return nil
 }
 
-func (s *Storage) AddSessionClickEvent(bannerID string, slotID string, socialDemoID string) error {
+func (s *Storage) AddClickEvent(bannerID string, slotID string, socialDemoID string) error {
 	date := time.Now().String()
-	_, err := s.db.Exec("INSERT INTO session_clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
+	_, err := s.db.Exec("INSERT INTO clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
 		return err
 	}
@@ -131,9 +85,9 @@ func (s *Storage) AddSessionClickEvent(bannerID string, slotID string, socialDem
 	return nil
 }
 
-func (s *Storage) AddSessionViewEvent(bannerID string, slotID string, socialDemoID string) error {
+func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID string) error {
 	date := time.Now().String()
-	_, err := s.db.Exec("INSERT INTO session_views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
+	_, err := s.db.Exec("INSERT INTO views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
 		return err
 	}
@@ -146,78 +100,40 @@ func (s *Storage) AddSessionViewEvent(bannerID string, slotID string, socialDemo
 	return nil
 }
 
-func (s *Storage) MapDataFromDB(
-	bannersInSlot []BannerRotationItem,
-	sessionBannersClicks []SessionClickItem,
-	sessionBannersViews []SessionViewItem) (
-	banners []string,
-	bannersClicks map[string]int,
-	bannersViews map[string]int,
-) {
-	bannersClicks = make(map[string]int)
-	bannersViews = make(map[string]int)
-
-	for _, banner := range bannersInSlot {
-		banners = append(banners, banner.BannerID)
+func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []storage.NotViewedItem, err error) {
+	err = s.db.Select(&notViewedBanners, "SELECT slot_id,banner_id FROM banners_rotation WHERE slot_id=$1 EXCEPT SELECT slot_id,banner_id FROM views", slotID)
+	if err != nil {
+		return nil, err
 	}
 
-	for _, click := range sessionBannersClicks {
-		bannersClicks[click.BannerID]++
-	}
-
-	for _, view := range sessionBannersViews {
-		bannersViews[view.BannerID]++
-	}
-
-	return banners, bannersClicks, bannersViews
+	return notViewedBanners, nil
 }
 
-func (s *Storage) GetBanner(slotID string, socialDemoID string) (string, error) {
-	var bannersInSlot []BannerRotationItem
-	var sessionBannersClicks []SessionClickItem
-	var sessionBannersViews []SessionViewItem
-	var notViewedBanners []NotViewedItem
-
-	err := s.db.Select(&notViewedBanners, "SELECT slot_id,banner_id FROM banners_rotation WHERE slot_id=$1 EXCEPT SELECT slot_id,banner_id FROM session_views", slotID)
-	if err != nil {
-		return "", err
-	}
-
-	if len(notViewedBanners) > 0 {
-		bannerID := notViewedBanners[0].BannerID
-
-		err := s.AddSessionViewEvent(bannerID, slotID, socialDemoID)
-		if err != nil {
-			return "", err
-		}
-
-		return bannerID, nil
-	}
-
+func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []storage.BannerRotationItem, err error) {
 	err = s.db.Select(&bannersInSlot, "SELECT * FROM banners_rotation WHERE slot_id=$1", slotID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = s.db.Select(&sessionBannersClicks, "SELECT * FROM session_clicks WHERE slot_id=$1", slotID)
+	return bannersInSlot, nil
+}
+
+func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []storage.ClickItem, err error) {
+	err = s.db.Select(&bannersClicks, "SELECT * FROM clicks WHERE slot_id=$1", slotID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = s.db.Select(&sessionBannersViews, "SELECT * FROM session_views WHERE slot_id=$1", slotID)
+	return bannersClicks, nil
+}
+
+func (s *Storage) GetBannersViews(slotID string) (bannersViews []storage.ViewItem, err error) {
+	err = s.db.Select(&bannersViews, "SELECT * FROM views WHERE slot_id=$1", slotID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	banners, bannersClicks, bannersViews := s.MapDataFromDB(bannersInSlot, sessionBannersClicks, sessionBannersViews)
-	bannerID := s.bandit.Use(banners, bannersClicks, bannersViews)
-
-	err = s.AddSessionViewEvent(bannerID, slotID, socialDemoID)
-	if err != nil {
-		return "", err
-	}
-
-	return bannerID, nil
+	return bannersViews, nil
 }
 
 func (s *Storage) CreateBanner(id string, description string) (string, error) {

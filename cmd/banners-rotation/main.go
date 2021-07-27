@@ -54,7 +54,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	brApp := app.New(logg, storage)
+	bandit := bandit.New()
+	brApp := app.New(logg, storage, bandit)
 
 	server, err := gw.NewServer(brApp, config.HTTP.Host, config.HTTP.Port, config.HTTP.GrpcPort)
 	if err != nil {
@@ -105,9 +106,7 @@ func initStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error
 		return nil, fmt.Errorf("cannot connect to amqp producer, %w", err)
 	}
 
-	bandit := bandit.New()
-
-	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, bandit, producer)
+	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, producer)
 	if err != nil {
 		return nil, fmt.Errorf("can't create new storage instance, %w", err)
 	}
@@ -115,16 +114,6 @@ func initStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error
 	err = storage.Connect(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to storage, %w", err)
-	}
-
-	err = storage.ClearSessionClicks()
-	if err != nil {
-		return nil, fmt.Errorf("cannot clear session clicks table, %w", err)
-	}
-
-	err = storage.ClearSessionViews()
-	if err != nil {
-		return nil, fmt.Errorf("cannot clear session views table, %w", err)
 	}
 
 	return storage, nil

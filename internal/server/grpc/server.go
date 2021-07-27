@@ -115,7 +115,7 @@ func (s *grpcserver) AddBanner(ctx context.Context, in *gw.AddBannerRequest) (*g
 		return nil, status.Errorf(codes.InvalidArgument, "cannot add banner in rotation, %s", ErrBadRequest)
 	}
 
-	err := s.app.GetStorage().AddBannerRotation(in.BannerId, in.SlotId)
+	err := s.app.AddBannerRotation(in.BannerId, in.SlotId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot add banner in rotation, %s", err)
 	}
@@ -128,7 +128,7 @@ func (s *grpcserver) RemoveBanner(ctx context.Context, in *gw.RemoveBannerReques
 		return nil, status.Errorf(codes.InvalidArgument, "cannot remove banner from rotation, %s", ErrBadRequest)
 	}
 
-	err := s.app.GetStorage().RemoveBannerRotation(in.BannerId, in.SlotId)
+	err := s.app.RemoveBannerRotation(in.BannerId, in.SlotId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot remove banner from rotation, %s", err)
 	}
@@ -141,7 +141,7 @@ func (s *grpcserver) ClickEvent(ctx context.Context, in *gw.ClickEventRequest) (
 		return nil, status.Errorf(codes.InvalidArgument, "cannot click on banner, %s", ErrBadRequest)
 	}
 
-	err := s.app.GetStorage().AddSessionClickEvent(in.BannerId, in.SlotId, in.SocialDemoId)
+	err := s.app.AddClickEvent(in.BannerId, in.SlotId, in.SocialDemoId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot add click event, %s", err)
 	}
@@ -154,7 +154,7 @@ func (s *grpcserver) GetBanner(ctx context.Context, in *gw.GetBannerRequest) (*g
 		return nil, status.Errorf(codes.InvalidArgument, "cannot get banner, %s", ErrBadRequest)
 	}
 
-	ID, err := s.app.GetStorage().GetBanner(in.SlotId, in.SocialDemoId)
+	ID, err := s.app.GetBanner(in.SlotId, in.SocialDemoId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot get banners, %s", err)
 	}
@@ -169,7 +169,7 @@ func (s *grpcserver) CreateBanner(ctx context.Context, in *gw.BannerRequest) (*g
 		ID = uuid.New().String()
 	}
 
-	ID, err := s.app.GetStorage().CreateBanner(ID, in.Description)
+	ID, err := s.app.CreateBanner(ID, in.Description)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create banner, %s", err)
 	}
@@ -184,7 +184,7 @@ func (s *grpcserver) CreateSlot(ctx context.Context, in *gw.SlotRequest) (*gw.Sl
 		ID = uuid.New().String()
 	}
 
-	ID, err := s.app.GetStorage().CreateSlot(ID, in.Description)
+	ID, err := s.app.CreateSlot(ID, in.Description)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create slot, %s", err)
 	}
@@ -198,7 +198,7 @@ func (s *grpcserver) CreateSocialDemo(ctx context.Context, in *gw.SocialDemoRequ
 		ID = uuid.New().String()
 	}
 
-	ID, err := s.app.GetStorage().CreateSocialDemo(ID, in.Description)
+	ID, err := s.app.CreateSocialDemo(ID, in.Description)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create social demo, %s", err)
 	}

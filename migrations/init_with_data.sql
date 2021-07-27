@@ -21,14 +21,14 @@ CREATE TABLE "banners_rotation" (
 	"banner_id" TEXT NOT NULL
 );
 
-CREATE TABLE "session_clicks" (
+CREATE TABLE "clicks" (
 	"slot_id" TEXT NOT NULL,
 	"banner_id" TEXT NOT NULL,
 	"social_demo_id" TEXT NOT NULL,
 	"date" TEXT NOT NULL
 );
 
-CREATE TABLE "session_views" (
+CREATE TABLE "views" (
 	"slot_id" TEXT NOT NULL,
 	"banner_id" TEXT NOT NULL,
 	"social_demo_id" TEXT NOT NULL,
@@ -83,14 +83,14 @@ INSERT INTO "banners_rotation" ("slot_id","banner_id") VALUES ('slot5','banner3'
 INSERT INTO "banners_rotation" ("slot_id","banner_id") VALUES ('slot5','banner4');
 INSERT INTO "banners_rotation" ("slot_id","banner_id") VALUES ('slot5','banner5');
 
--- INSERT INTO "session_views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner1','social_demo1','TEST');
--- INSERT INTO "session_views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner2','social_demo2','TEST');
--- INSERT INTO "session_views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner3','social_demo3','TEST');
--- INSERT INTO "session_views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner4','social_demo4','TEST');
--- INSERT INTO "session_views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner5','social_demo5','TEST');
+-- INSERT INTO "views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner1','social_demo1','TEST');
+-- INSERT INTO "views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner2','social_demo2','TEST');
+-- INSERT INTO "views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner3','social_demo3','TEST');
+-- INSERT INTO "views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner4','social_demo4','TEST');
+-- INSERT INTO "views" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner5','social_demo5','TEST');
 
--- INSERT INTO "session_clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner1','social_demo1','TEST');
--- INSERT INTO "session_clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner2','social_demo2','TEST');
--- INSERT INTO "session_clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner3','social_demo3','TEST');
--- INSERT INTO "session_clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner4','social_demo4','TEST');
--- INSERT INTO "session_clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner5','social_demo5','TEST');
+-- INSERT INTO "clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner1','social_demo1','TEST');
+-- INSERT INTO "clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner2','social_demo2','TEST');
+-- INSERT INTO "clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner3','social_demo3','TEST');
+-- INSERT INTO "clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner4','social_demo4','TEST');
+-- INSERT INTO "clicks" ("slot_id","banner_id","social_demo_id","date") VALUES ('slot3','banner5','social_demo5','TEST');

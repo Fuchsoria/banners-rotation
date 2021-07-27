@@ -21,14 +21,14 @@ CREATE TABLE "banners_rotation" (
 	"banner_id" TEXT NOT NULL
 );
 
-CREATE TABLE "session_clicks" (
+CREATE TABLE "clicks" (
 	"slot_id" TEXT NOT NULL,
 	"banner_id" TEXT NOT NULL,
 	"social_demo_id" TEXT NOT NULL,
 	"date" TEXT NOT NULL
 );
 
-CREATE TABLE "session_views" (
+CREATE TABLE "views" (
 	"slot_id" TEXT NOT NULL,
 	"banner_id" TEXT NOT NULL,
 	"social_demo_id" TEXT NOT NULL,
