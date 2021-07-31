@@ -20,6 +20,9 @@ version: build
 	$(BIN) version
 
 test:
+	go test -race -v ./internal/... -count 100
+	
+t:
 	go test -race -v ./internal/...
 
 install-lint-deps:

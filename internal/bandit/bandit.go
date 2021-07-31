@@ -8,7 +8,7 @@ type Bandit struct{}
 
 func (b *Bandit) GetScore(viewsCount float64, clicksCount float64, totalUses float64) float64 {
 	clickViewRate := clicksCount / viewsCount
-	banditRate := math.Sqrt((math.Log2(totalUses) / viewsCount))
+	banditRate := math.Sqrt(((2 * math.Log(totalUses)) / viewsCount))
 
 	return clickViewRate + banditRate
 }
