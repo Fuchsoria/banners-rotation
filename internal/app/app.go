@@ -34,7 +34,7 @@ type Storage interface {
 }
 
 type Bandit interface {
-	Use(items []string, clicks map[string]int, views map[string]int) string
+	Use(items []string, clicks map[string]int, views map[string]int) (string, error)
 }
 
 func New(logger Logger, storage Storage, bandit Bandit) *App {
@@ -52,15 +52,19 @@ func (a *App) GetStorage() Storage {
 func (a *App) AddBannerRotation(bannerID string, slotID string) error {
 	return a.storage.AddBannerRotation(bannerID, slotID)
 }
+
 func (a *App) RemoveBannerRotation(bannerID string, slotID string) error {
 	return a.storage.RemoveBannerRotation(bannerID, slotID)
 }
+
 func (a *App) AddClickEvent(bannerID string, slotID string, socialDemoID string) error {
 	return a.storage.AddClickEvent(bannerID, slotID, socialDemoID)
 }
+
 func (a *App) AddViewEvent(bannerID string, slotID string, socialDemoID string) error {
 	return a.storage.AddViewEvent(bannerID, slotID, socialDemoID)
 }
+
 func (a *App) MapDataFromDB(
 	bannersInSlot []storage.BannerRotationItem,
 	bannersClicks []storage.ClickItem,
@@ -86,6 +90,7 @@ func (a *App) MapDataFromDB(
 
 	return banners, mappedBannersClicks, mappedBannersViews
 }
+
 func (a *App) GetBanner(slotID string, socialDemoID string) (string, error) {
 	notViewedBanners, err := a.storage.GetNotViewedBanners(slotID)
 	if err != nil {
@@ -119,7 +124,10 @@ func (a *App) GetBanner(slotID string, socialDemoID string) (string, error) {
 	}
 
 	banners, mappedBannersClicks, mappedBannersViews := a.MapDataFromDB(bannersInSlot, bannersClicks, bannersViews)
-	bannerID := a.bandit.Use(banners, mappedBannersClicks, mappedBannersViews)
+	bannerID, err := a.bandit.Use(banners, mappedBannersClicks, mappedBannersViews)
+	if err != nil {
+		return "", err
+	}
 
 	err = a.AddViewEvent(bannerID, slotID, socialDemoID)
 	if err != nil {
@@ -128,12 +136,15 @@ func (a *App) GetBanner(slotID string, socialDemoID string) (string, error) {
 
 	return bannerID, nil
 }
+
 func (a *App) CreateBanner(id string, description string) (string, error) {
 	return a.storage.CreateBanner(id, description)
 }
+
 func (a *App) CreateSlot(id string, description string) (string, error) {
 	return a.storage.CreateSlot(id, description)
 }
+
 func (a *App) CreateSocialDemo(id string, description string) (string, error) {
 	return a.storage.CreateSocialDemo(id, description)
 }
