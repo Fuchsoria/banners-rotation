@@ -1,7 +1,6 @@
 package bandit
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -99,7 +98,6 @@ func TestBandit(t *testing.T) {
 	t.Run("test empty views", func(t *testing.T) {
 		item, err := bandit.Use([]string{"item1", "item2"}, map[string]int{}, map[string]int{})
 
-		fmt.Println(item, err)
 		require.ErrorIs(t, err, ErrNoViewsForItem)
 		require.Empty(t, item)
 	})

@@ -65,20 +65,12 @@ dev: dev-build-container
 up:
 	docker-compose up --build
 
-integration-tests-cleanup:
-	docker-compose -f docker-compose.test.yaml down \
-    --rmi local \
-		--volumes \
-		--remove-orphans \
-		--timeout 60; \
-  	docker-compose rm -f
-
 integration-tests:
 	set -e ;\
-	docker-compose -f docker-compose.test.yaml up --build -d ;\
+	docker-compose -f docker-compose.test.yaml -p banners-rotation-integration-tests up --build -d;\
 	test_status_code=0 ;\
-	docker-compose -f docker-compose.test.yaml run integration_tests go test -v || test_status_code=$$? ;\
-	docker-compose -f docker-compose.test.yaml down ;\
+	docker-compose -f docker-compose.test.yaml -p banners-rotation-integration-tests run integration_tests go test -v || test_status_code=$$? ;\
+	docker-compose -f docker-compose.test.yaml -p banners-rotation-integration-tests down ;\
 	exit $$test_status_code ;
 
-.PHONY: build build-img run-img version test lint install-lint-deps generate-deps generate generate-gateway upl run stop dev integration-tests-cleanup integration-tests
+.PHONY: build build-img run-img version test lint install-lint-deps generate-gateway run stop dev up integration-tests

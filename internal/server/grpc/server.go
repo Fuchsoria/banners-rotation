@@ -130,7 +130,7 @@ func (s *grpcserver) RemoveBanner(ctx context.Context, in *gw.RemoveBannerReques
 
 	err := s.app.RemoveBannerRotation(in.BannerId, in.SlotId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot remove banner from rotation, %s", err)
+		return nil, status.Errorf(codes.NotFound, "cannot remove banner from rotation, %s", err)
 	}
 
 	return &gw.MessageResponse{Message: "removed"}, nil
@@ -156,7 +156,7 @@ func (s *grpcserver) GetBanner(ctx context.Context, in *gw.GetBannerRequest) (*g
 
 	ID, err := s.app.GetBanner(in.SlotId, in.SocialDemoId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot get banners, %s", err)
+		return nil, status.Errorf(codes.NotFound, "cannot get banners, %s", err)
 	}
 
 	return &gw.BannerResponse{Id: ID}, nil
@@ -166,7 +166,7 @@ func (s *grpcserver) CreateBanner(ctx context.Context, in *gw.BannerRequest) (*g
 	ID := in.Id
 
 	if ID == "" {
-		ID = uuid.New().String()
+		ID = uuid.NewString()
 	}
 
 	ID, err := s.app.CreateBanner(ID, in.Description)
@@ -181,7 +181,7 @@ func (s *grpcserver) CreateSlot(ctx context.Context, in *gw.SlotRequest) (*gw.Sl
 	ID := in.Id
 
 	if ID == "" {
-		ID = uuid.New().String()
+		ID = uuid.NewString()
 	}
 
 	ID, err := s.app.CreateSlot(ID, in.Description)
@@ -195,7 +195,7 @@ func (s *grpcserver) CreateSocialDemo(ctx context.Context, in *gw.SocialDemoRequ
 	ID := in.Id
 
 	if ID == "" {
-		ID = uuid.New().String()
+		ID = uuid.NewString()
 	}
 
 	ID, err := s.app.CreateSocialDemo(ID, in.Description)

@@ -1,30 +1,30 @@
 version: '3.7'
 
 networks:
-  rabbit:
+  rabbit_test:
     driver: bridge
-  postgres:
+  postgres_test:
     driver: bridge
-  banners-rotation:
+  banners-rotation_test:
     driver: bridge
 
 services:
   integration_tests:
-    build: tests
+    build: "tests"
     command: 'true'
     environment:
       TESTS_AMQP_DSN: 'amqp://guest:guest@rabbit:5672/'
-      TESTS_POSTGRES_DSN: 'host=postgres port=5432 user=postgres password=example dbname=postgres sslmode=disable'
-      TESTS_HTTP_HOST: 'http://banners-rotation:5555'
-      WAIT_HOSTS: postgres:5432, rabbit:5672, banners-rotation:5555
+      TESTS_POSTGRES_DSN: 'host=postgres_test port=5432 user=postgres password=example dbname=banners-rotation_test sslmode=disable'
+      TESTS_HTTP_HOST: 'http://banners-rotation_test:5555'
+      WAIT_HOSTS: postgres_test:5432, rabbit_test:5672, banners-rotation_test:5555
     depends_on: 
       - banners-rotation
     links:
       - banners-rotation
     networks:
-      - rabbit
-      - postgres
-      - banners-rotation
+      - rabbit_test
+      - postgres_test
+      - banners-rotation_test
 
   postgres:
     image: postgres
@@ -36,11 +36,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: example
-      POSTGRES_DB: postgres
+      POSTGRES_DB: banners-rotation_test
     volumes:
       - ./migrations/init_with_data.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - postgres
+      - postgres_test
 
   rabbit:
     image: rabbitmq:3.7.17-management
@@ -53,7 +53,7 @@ services:
       - ./configs/rabbit.def.json:/etc/rabbitmq/definitions.json:ro
       - ./configs/rabbit.config:/etc/rabbitmq/rabbitmq.config:ro
     networks:
-      - rabbit
+      - rabbit_test
 
   banners-rotation:
     build:
@@ -68,10 +68,10 @@ services:
       - postgres
     restart: on-failure
     environment:
-      - WAIT_HOSTS=postgres:5432, rabbit:5672
+      - WAIT_HOSTS=postgres_test:5432, rabbit_test:5672
     volumes:
       - ./logs/containers/:/logs/
     networks:
-      - banners-rotation
-      - rabbit
-      - postgres
+      - banners-rotation_test
+      - rabbit_test
+      - postgres_test
