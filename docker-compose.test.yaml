@@ -13,7 +13,7 @@ services:
     build: "tests"
     command: 'true'
     environment:
-      TESTS_AMQP_DSN: 'amqp://guest:guest@rabbit:5672/'
+      TESTS_AMQP_DSN: 'amqp://guest:guest@rabbit_test:5672/'
       TESTS_POSTGRES_DSN: 'host=postgres_test port=5432 user=postgres password=example dbname=banners-rotation_test sslmode=disable'
       TESTS_HTTP_HOST: 'http://banners-rotation_test:5555'
       WAIT_HOSTS: postgres_test:5432, rabbit_test:5672, banners-rotation_test:5555
