@@ -69,7 +69,7 @@ func (s *Storage) Close() error {
 func (s *Storage) AddBannerRotation(bannerID string, slotID string) error {
 	_, err := s.db.Exec("INSERT INTO banners_rotation (slot_id,banner_id) VALUES ($1,$2)", slotID, bannerID)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot insert banner to rotation, %w", err)
 	}
 
 	return nil
@@ -78,16 +78,16 @@ func (s *Storage) AddBannerRotation(bannerID string, slotID string) error {
 func (s *Storage) RemoveBannerRotation(bannerID string, slotID string) error {
 	result, err := s.db.Exec("DELETE FROM banners_rotation WHERE slot_id=$1 AND banner_id=$2", slotID, bannerID)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot delete banner from rotation, %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot get affected rows count, %w", err)
 	}
 
 	if rowsAffected == 0 {
-		return ErrBannersWereRemoved
+		return fmt.Errorf("rows are not affected on rotation delete, %w", ErrBannersWereRemoved)
 	}
 
 	return nil
@@ -97,12 +97,12 @@ func (s *Storage) AddClickEvent(bannerID string, slotID string, socialDemoID str
 	date := time.Now().String()
 	_, err := s.db.Exec("INSERT INTO clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot insert banner click, %w", err)
 	}
 
 	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "click", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot publish banner click, %w", err)
 	}
 
 	return nil
@@ -112,12 +112,12 @@ func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID stri
 	date := time.Now().String()
 	_, err := s.db.Exec("INSERT INTO views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot insert banner view, %w", err)
 	}
 
 	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "view", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot publish banner click, %w", err)
 	}
 
 	return nil
