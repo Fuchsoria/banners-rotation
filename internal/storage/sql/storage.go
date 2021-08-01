@@ -126,7 +126,7 @@ func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID stri
 func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []NotViewedItem, err error) {
 	err = s.db.Select(&notViewedBanners, "SELECT slot_id,banner_id FROM banners_rotation WHERE slot_id=$1 EXCEPT SELECT slot_id,banner_id FROM views", slotID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get not viewed banners, %w", err)
 	}
 
 	return notViewedBanners, nil
@@ -135,7 +135,7 @@ func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []NotView
 func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []BannerRotationItem, err error) {
 	err = s.db.Select(&bannersInSlot, "SELECT * FROM banners_rotation WHERE slot_id=$1", slotID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get banners from slot, %w", err)
 	}
 
 	return bannersInSlot, nil
@@ -144,7 +144,7 @@ func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []BannerRotatio
 func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []ClickItem, err error) {
 	err = s.db.Select(&bannersClicks, "SELECT * FROM clicks WHERE slot_id=$1", slotID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get clicked banners, %w", err)
 	}
 
 	return bannersClicks, nil
@@ -153,7 +153,7 @@ func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []ClickItem, er
 func (s *Storage) GetBannersViews(slotID string) (bannersViews []ViewItem, err error) {
 	err = s.db.Select(&bannersViews, "SELECT * FROM views WHERE slot_id=$1", slotID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get viewed banners, %w", err)
 	}
 
 	return bannersViews, nil
@@ -162,7 +162,7 @@ func (s *Storage) GetBannersViews(slotID string) (bannersViews []ViewItem, err e
 func (s *Storage) CreateBanner(id string, description string) (string, error) {
 	_, err := s.db.Exec("INSERT INTO banners (id,description) VALUES ($1,$2)", id, description)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot insert banner, %w", err)
 	}
 
 	return id, nil
@@ -171,7 +171,7 @@ func (s *Storage) CreateBanner(id string, description string) (string, error) {
 func (s *Storage) CreateSlot(id string, description string) (string, error) {
 	_, err := s.db.Exec("INSERT INTO slots (id,description) VALUES ($1,$2)", id, description)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot insert slot, %w", err)
 	}
 
 	return id, nil
@@ -180,7 +180,7 @@ func (s *Storage) CreateSlot(id string, description string) (string, error) {
 func (s *Storage) CreateSocialDemo(id string, description string) (string, error) {
 	_, err := s.db.Exec("INSERT INTO social_demos (id,description) VALUES ($1,$2)", id, description)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot insert social demo, %w", err)
 	}
 
 	return id, nil
