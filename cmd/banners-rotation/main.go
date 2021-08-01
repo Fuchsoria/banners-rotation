@@ -13,6 +13,7 @@ import (
 	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
 	"github.com/Fuchsoria/banners-rotation/internal/app"
 	"github.com/Fuchsoria/banners-rotation/internal/bandit"
+	"github.com/Fuchsoria/banners-rotation/internal/config"
 	"github.com/Fuchsoria/banners-rotation/internal/logger"
 	gw "github.com/Fuchsoria/banners-rotation/internal/server/grpc"
 	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
@@ -38,16 +39,16 @@ func main() {
 		return
 	}
 
-	config, err := NewConfig()
+	configuration, err := config.New(configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	logg := logger.New(config.Logger.Level, config.Logger.File)
+	logg := logger.New(configuration.Logger.Level, configuration.Logger.File)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	storage, err := initStorage(ctx, config)
+	storage, err := initStorage(ctx, configuration)
 	if err != nil {
 		logg.Error(err.Error())
 
@@ -57,7 +58,7 @@ func main() {
 	bandit := bandit.New()
 	brApp := app.New(logg, storage, bandit)
 
-	server, err := gw.NewServer(brApp, config.HTTP.Host, config.HTTP.Port, config.HTTP.GrpcPort)
+	server, err := gw.NewServer(brApp, configuration.HTTP.Host, configuration.HTTP.Port, configuration.HTTP.GrpcPort)
 	if err != nil {
 		logg.Error(err.Error())
 	}
@@ -94,19 +95,19 @@ func main() {
 	}
 }
 
-func initStorage(ctx context.Context, config Config) (*sqlstorage.Storage, error) {
-	conn, err := amqp.Dial(config.AMPQ.URI)
+func initStorage(ctx context.Context, configuration config.Config) (*sqlstorage.Storage, error) {
+	conn, err := amqp.Dial(configuration.AMPQ.URI)
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to amqp, %w", err)
 	}
 
-	producer := simpleproducer.New(config.AMPQ.Name, conn)
+	producer := simpleproducer.New(configuration.AMPQ.Name, conn)
 	err = producer.Connect()
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to amqp producer, %w", err)
 	}
 
-	storage, err := sqlstorage.New(ctx, config.DB.ConnectionString, producer)
+	storage, err := sqlstorage.New(ctx, configuration.DB.ConnectionString, producer)
 	if err != nil {
 		return nil, fmt.Errorf("can't create new storage instance, %w", err)
 	}

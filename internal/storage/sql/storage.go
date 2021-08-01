@@ -7,7 +7,6 @@ import (
 	"time"
 
 	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
-	"github.com/Fuchsoria/banners-rotation/internal/storage"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,6 +17,30 @@ type Producer interface {
 type Storage struct {
 	db       *sqlx.DB
 	producer Producer
+}
+
+type BannerRotationItem struct {
+	SlotID   string `db:"slot_id"`
+	BannerID string `db:"banner_id"`
+}
+
+type ClickItem struct {
+	SlotID       string `db:"slot_id"`
+	BannerID     string `db:"banner_id"`
+	SocialDemoID string `db:"social_demo_id"`
+	Date         string `db:"date"`
+}
+
+type ViewItem struct {
+	SlotID       string `db:"slot_id"`
+	BannerID     string `db:"banner_id"`
+	SocialDemoID string `db:"social_demo_id"`
+	Date         string `db:"date"`
+}
+
+type NotViewedItem struct {
+	SlotID   string `db:"slot_id"`
+	BannerID string `db:"banner_id"`
 }
 
 var ErrBannersWereRemoved = errors.New("banners were not removed from rotation")
@@ -100,7 +123,7 @@ func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID stri
 	return nil
 }
 
-func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []storage.NotViewedItem, err error) {
+func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []NotViewedItem, err error) {
 	err = s.db.Select(&notViewedBanners, "SELECT slot_id,banner_id FROM banners_rotation WHERE slot_id=$1 EXCEPT SELECT slot_id,banner_id FROM views", slotID)
 	if err != nil {
 		return nil, err
@@ -109,7 +132,7 @@ func (s *Storage) GetNotViewedBanners(slotID string) (notViewedBanners []storage
 	return notViewedBanners, nil
 }
 
-func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []storage.BannerRotationItem, err error) {
+func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []BannerRotationItem, err error) {
 	err = s.db.Select(&bannersInSlot, "SELECT * FROM banners_rotation WHERE slot_id=$1", slotID)
 	if err != nil {
 		return nil, err
@@ -118,7 +141,7 @@ func (s *Storage) GetBannersInSlot(slotID string) (bannersInSlot []storage.Banne
 	return bannersInSlot, nil
 }
 
-func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []storage.ClickItem, err error) {
+func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []ClickItem, err error) {
 	err = s.db.Select(&bannersClicks, "SELECT * FROM clicks WHERE slot_id=$1", slotID)
 	if err != nil {
 		return nil, err
@@ -127,7 +150,7 @@ func (s *Storage) GetBannersClicks(slotID string) (bannersClicks []storage.Click
 	return bannersClicks, nil
 }
 
-func (s *Storage) GetBannersViews(slotID string) (bannersViews []storage.ViewItem, err error) {
+func (s *Storage) GetBannersViews(slotID string) (bannersViews []ViewItem, err error) {
 	err = s.db.Select(&bannersViews, "SELECT * FROM views WHERE slot_id=$1", slotID)
 	if err != nil {
 		return nil, err

@@ -58,7 +58,7 @@ services:
   banners-rotation:
     build:
       context: .
-      dockerfile: ./cmd/banners-rotation/Dockerfile
+      dockerfile: ./build/Dockerfile
       args:
         - CONFIG_FILE_NAME=config.test
     hostname: banners-rotation

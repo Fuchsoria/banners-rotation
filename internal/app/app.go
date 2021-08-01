@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/Fuchsoria/banners-rotation/internal/storage"
+	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
 	"go.uber.org/zap"
 )
 
@@ -24,10 +24,10 @@ type Storage interface {
 	RemoveBannerRotation(bannerID string, slotID string) error
 	AddClickEvent(bannerID string, slotID string, socialDemoID string) error
 	AddViewEvent(bannerID string, slotID string, socialDemoID string) error
-	GetNotViewedBanners(slotID string) ([]storage.NotViewedItem, error)
-	GetBannersClicks(slotID string) ([]storage.ClickItem, error)
-	GetBannersViews(slotID string) ([]storage.ViewItem, error)
-	GetBannersInSlot(slotID string) ([]storage.BannerRotationItem, error)
+	GetNotViewedBanners(slotID string) ([]sqlstorage.NotViewedItem, error)
+	GetBannersClicks(slotID string) ([]sqlstorage.ClickItem, error)
+	GetBannersViews(slotID string) ([]sqlstorage.ViewItem, error)
+	GetBannersInSlot(slotID string) ([]sqlstorage.BannerRotationItem, error)
 	CreateBanner(ID string, description string) (string, error)
 	CreateSlot(ID string, description string) (string, error)
 	CreateSocialDemo(ID string, description string) (string, error)
@@ -43,10 +43,6 @@ func New(logger Logger, storage Storage, bandit Bandit) *App {
 
 func (a *App) GetLogger() Logger {
 	return a.logger
-}
-
-func (a *App) GetStorage() Storage {
-	return a.storage
 }
 
 func (a *App) AddBannerRotation(bannerID string, slotID string) error {
@@ -66,9 +62,9 @@ func (a *App) AddViewEvent(bannerID string, slotID string, socialDemoID string) 
 }
 
 func (a *App) MapDataFromDB(
-	bannersInSlot []storage.BannerRotationItem,
-	bannersClicks []storage.ClickItem,
-	bannersViews []storage.ViewItem) (
+	bannersInSlot []sqlstorage.BannerRotationItem,
+	bannersClicks []sqlstorage.ClickItem,
+	bannersViews []sqlstorage.ViewItem) (
 	banners []string,
 	mappedBannersClicks map[string]int,
 	mappedBannersViews map[string]int,

@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ type AMPQConf struct {
 	Name string `json:"name"`
 }
 
-func NewConfig() (Config, error) {
+func New(configFile string) (Config, error) {
 	viper.SetConfigFile(configFile)
 
 	if err := viper.ReadInConfig(); err != nil { // Handle errors reading the config file
