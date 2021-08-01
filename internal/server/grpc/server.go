@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Fuchsoria/banners-rotation/internal/app"
-	gw "github.com/Fuchsoria/banners-rotation/internal/server/pb/BannersRotation"
+	gw "github.com/Fuchsoria/banners-rotation/internal/server/pb/api"
 	"github.com/google/uuid"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"

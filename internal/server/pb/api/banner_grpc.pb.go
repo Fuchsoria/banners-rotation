@@ -37,7 +37,7 @@ func NewBannersRotationClient(cc grpc.ClientConnInterface) BannersRotationClient
 
 func (c *bannersRotationClient) AddBanner(ctx context.Context, in *AddBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
 	out := new(MessageResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/AddBanner", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/AddBanner", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *bannersRotationClient) AddBanner(ctx context.Context, in *AddBannerRequ
 
 func (c *bannersRotationClient) RemoveBanner(ctx context.Context, in *RemoveBannerRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
 	out := new(MessageResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/RemoveBanner", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/RemoveBanner", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *bannersRotationClient) RemoveBanner(ctx context.Context, in *RemoveBann
 
 func (c *bannersRotationClient) ClickEvent(ctx context.Context, in *ClickEventRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
 	out := new(MessageResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/ClickEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/ClickEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *bannersRotationClient) ClickEvent(ctx context.Context, in *ClickEventRe
 
 func (c *bannersRotationClient) GetBanner(ctx context.Context, in *GetBannerRequest, opts ...grpc.CallOption) (*BannerResponse, error) {
 	out := new(BannerResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/GetBanner", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/GetBanner", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (c *bannersRotationClient) GetBanner(ctx context.Context, in *GetBannerRequ
 
 func (c *bannersRotationClient) CreateBanner(ctx context.Context, in *BannerRequest, opts ...grpc.CallOption) (*BannerResponse, error) {
 	out := new(BannerResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateBanner", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/CreateBanner", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *bannersRotationClient) CreateBanner(ctx context.Context, in *BannerRequ
 
 func (c *bannersRotationClient) CreateSlot(ctx context.Context, in *SlotRequest, opts ...grpc.CallOption) (*SlotResponse, error) {
 	out := new(SlotResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateSlot", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/CreateSlot", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *bannersRotationClient) CreateSlot(ctx context.Context, in *SlotRequest,
 
 func (c *bannersRotationClient) CreateSocialDemo(ctx context.Context, in *SocialDemoRequest, opts ...grpc.CallOption) (*SocialDemoResponse, error) {
 	out := new(SocialDemoResponse)
-	err := c.cc.Invoke(ctx, "/BannersRotation.BannersRotation/CreateSocialDemo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/banner.BannersRotation/CreateSocialDemo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func _BannersRotation_AddBanner_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/AddBanner",
+		FullMethod: "/banner.BannersRotation/AddBanner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).AddBanner(ctx, req.(*AddBannerRequest))
@@ -178,7 +178,7 @@ func _BannersRotation_RemoveBanner_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/RemoveBanner",
+		FullMethod: "/banner.BannersRotation/RemoveBanner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).RemoveBanner(ctx, req.(*RemoveBannerRequest))
@@ -196,7 +196,7 @@ func _BannersRotation_ClickEvent_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/ClickEvent",
+		FullMethod: "/banner.BannersRotation/ClickEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).ClickEvent(ctx, req.(*ClickEventRequest))
@@ -214,7 +214,7 @@ func _BannersRotation_GetBanner_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/GetBanner",
+		FullMethod: "/banner.BannersRotation/GetBanner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).GetBanner(ctx, req.(*GetBannerRequest))
@@ -232,7 +232,7 @@ func _BannersRotation_CreateBanner_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/CreateBanner",
+		FullMethod: "/banner.BannersRotation/CreateBanner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).CreateBanner(ctx, req.(*BannerRequest))
@@ -250,7 +250,7 @@ func _BannersRotation_CreateSlot_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/CreateSlot",
+		FullMethod: "/banner.BannersRotation/CreateSlot",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).CreateSlot(ctx, req.(*SlotRequest))
@@ -268,7 +268,7 @@ func _BannersRotation_CreateSocialDemo_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BannersRotation.BannersRotation/CreateSocialDemo",
+		FullMethod: "/banner.BannersRotation/CreateSocialDemo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BannersRotationServer).CreateSocialDemo(ctx, req.(*SocialDemoRequest))
@@ -280,7 +280,7 @@ func _BannersRotation_CreateSocialDemo_Handler(srv interface{}, ctx context.Cont
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BannersRotation_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "BannersRotation.BannersRotation",
+	ServiceName: "banner.BannersRotation",
 	HandlerType: (*BannersRotationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -313,5 +313,5 @@ var BannersRotation_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "BannersRotation/BannersRotation.proto",
+	Metadata: "api/banner.proto",
 }

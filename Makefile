@@ -38,14 +38,14 @@ generate: generate-deps
 	protoc -I ./proto \
     --go_out ./internal/server/pb/ --go_opt paths=source_relative \
     --go-grpc_out ./internal/server/pb/ --go-grpc_opt paths=source_relative \
-    proto/BannersRotation/*.proto
+    proto/api/*.proto
 
 generate-gateway: generate
 	protoc -I ./proto --grpc-gateway_out ./internal/server/pb \
 			--grpc-gateway_opt logtostderr=true \
 			--grpc-gateway_opt paths=source_relative \
 			--grpc-gateway_opt generate_unbound_methods=true \
-			proto/BannersRotation/*.proto
+			proto/api/*.proto
 
 dev-build-container:
 	docker rm --force banners-rotation-br

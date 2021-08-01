@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package BannersRotation;
+package banner;
 
 import "google/api/annotations.proto";
 
