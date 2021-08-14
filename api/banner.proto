@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package banner;
 
-import "google/api/annotations.proto";
+import "third_party/google/api/annotations.proto";
 
 option go_package = "./;pb";
 

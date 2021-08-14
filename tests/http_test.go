@@ -186,7 +186,7 @@ func TestStorage(t *testing.T) {
 		slotID := uuid.NewString()
 		socialDemoID := uuid.NewString()
 
-		err := storage.AddClickEvent(bannerID, slotID, socialDemoID, "")
+		err := storage.AddClickEvent(bannerID, slotID, socialDemoID, time.Now().String())
 		require.NoError(t, err, "should be without errors")
 
 		var click ClickDB
@@ -204,7 +204,7 @@ func TestStorage(t *testing.T) {
 		slotID := uuid.NewString()
 		socialDemoID := uuid.NewString()
 
-		err := storage.AddViewEvent(bannerID, slotID, socialDemoID, "")
+		err := storage.AddViewEvent(bannerID, slotID, socialDemoID, time.Now().String())
 		require.NoError(t, err, "should be without errors")
 
 		var view ViewDB
