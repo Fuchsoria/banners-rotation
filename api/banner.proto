@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package banner;
+
+import "third_party/google/api/annotations.proto";
+
+option go_package = "./;pb";
+
+message MessageResponse {
+  string message = 1;
+}
+
+message BannerResponse {
+  string id = 1;
+}
+
+message SlotResponse {
+  string id = 1;
+}
+
+message SocialDemoResponse {
+  string id = 1;
+}
+
+message SlotRequest {
+  string id = 1;
+  string description = 2;
+}
+
+message BannerRequest {
+  string id = 1;
+  string description = 2;
+}
+
+message SocialDemoRequest {
+  string id = 1;
+  string description = 2;
+}
+
+message AddBannerRequest {
+  string banner_id = 1;
+  string slot_id = 2;
+}
+
+message RemoveBannerRequest {
+  string slot_id = 1;
+  string banner_id = 2;
+}
+
+message ClickEventRequest {
+  string slot_id = 1;
+  string banner_id = 2;
+  string social_demo_id = 3;
+}
+
+message GetBannerRequest {
+  string slot_id = 1;
+  string social_demo_id = 2;
+}
+
+service BannersRotation {
+  rpc AddBanner(AddBannerRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/add"
+      body: "*"
+    };
+  }
+  rpc RemoveBanner(RemoveBannerRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/remove"
+      body: "*"
+    };
+  }
+  rpc ClickEvent(ClickEventRequest) returns (MessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/click"
+      body: "*"
+    };
+  }
+  rpc GetBanner(GetBannerRequest) returns (BannerResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/banners/get"
+      body: "*"
+    };
+  }
+  rpc CreateBanner(BannerRequest) returns (BannerResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/banners/create"
+      body: "*"
+    };
+  }
+  rpc CreateSlot(SlotRequest) returns (SlotResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/slots/create"
+      body: "*"
+    };
+  }
+  rpc CreateSocialDemo(SocialDemoRequest) returns (SocialDemoResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/social-demos/create"
+      body: "*"
+    };
+  }
+}

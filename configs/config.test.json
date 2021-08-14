@@ -1,0 +1,8 @@
+{
+  "logger": { "level": "debug", "file": "./logs/logs.log" },
+  "db": {
+    "connection_string": "host=postgres_test port=5432 user=postgres password=example dbname=banners-rotation_test sslmode=disable"
+  },
+  "http": { "host": "0.0.0.0", "port": 5555, "grpc_port": 7777 },
+  "ampq": { "uri": "amqp://guest:guest@rabbit_test:5672/", "name": "banners-rotation" }
+}

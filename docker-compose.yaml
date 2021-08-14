@@ -1,0 +1,67 @@
+version: '3.7'
+
+networks:
+  rabbit:
+    driver: bridge
+  postgres:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres
+    hostname: postgres
+    container_name: postgres-br
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: banners-rotation
+    volumes:
+      - ./migrations/init_with_data.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - postgres
+
+  rabbit:
+    image: rabbitmq:3.7.17-management
+    hostname: rabbit
+    container_name: rabbit-br
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    expose:
+      - 15672
+    restart: always
+    volumes:
+      - ./configs/rabbit.def.json:/etc/rabbitmq/definitions.json:ro
+      - ./configs/rabbit.config:/etc/rabbitmq/rabbitmq.config:ro
+    networks:
+      - rabbit
+
+  banners-rotation:
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile
+      args:
+        - CONFIG_FILE_NAME=config
+    container_name: banners-rotation-br
+    depends_on:
+      - rabbit
+      - postgres
+    restart: on-failure
+    environment:
+      - WAIT_HOSTS=postgres:5432, rabbit:5672
+    ports:
+      - '5555:5555'
+      - '7777:7777'
+    expose:
+      - 5555
+      - 7777
+    volumes:
+      - ./logs/containers/:/logs/
+    networks:
+      - rabbit
+      - postgres
