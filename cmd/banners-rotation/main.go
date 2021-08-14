@@ -55,8 +55,20 @@ func main() {
 		log.Fatal(err)
 	}
 
+	conn, err := amqp.Dial(configuration.AMPQ.URI)
+	if err != nil {
+		logg.Error(fmt.Errorf("cannot connect to amqp, %w", err).Error())
+	}
+
+	producer := simpleproducer.New(configuration.AMPQ.Name, conn)
+	err = producer.Connect()
+	if err != nil {
+		logg.Error(fmt.Errorf("cannot connect to amqp producer, %w", err).Error())
+	}
+
 	bandit := bandit.New()
-	brApp := app.New(logg, storage, bandit)
+
+	brApp := app.New(logg, storage, bandit, producer)
 
 	server, err := gw.NewServer(brApp, configuration.HTTP.Host, configuration.HTTP.Port, configuration.HTTP.GrpcPort)
 	if err != nil {
@@ -96,18 +108,7 @@ func main() {
 }
 
 func initStorage(ctx context.Context, configuration config.Config) (*sqlstorage.Storage, error) {
-	conn, err := amqp.Dial(configuration.AMPQ.URI)
-	if err != nil {
-		return nil, fmt.Errorf("cannot connect to amqp, %w", err)
-	}
-
-	producer := simpleproducer.New(configuration.AMPQ.Name, conn)
-	err = producer.Connect()
-	if err != nil {
-		return nil, fmt.Errorf("cannot connect to amqp producer, %w", err)
-	}
-
-	storage, err := sqlstorage.New(ctx, configuration.DB.ConnectionString, producer)
+	storage, err := sqlstorage.New(ctx, configuration.DB.ConnectionString)
 	if err != nil {
 		return nil, fmt.Errorf("can't create new storage instance, %w", err)
 	}

@@ -107,7 +107,7 @@ func TestStorage(t *testing.T) {
 	err = producer.Connect()
 	require.NoError(t, err, "should be without errors")
 
-	storage, err := sqlstorage.New(context.Background(), PostgresDSN, producer)
+	storage, err := sqlstorage.New(context.Background(), PostgresDSN)
 	require.NoError(t, err, "should be without errors")
 
 	t.Run("test banner create", func(t *testing.T) {
@@ -186,7 +186,7 @@ func TestStorage(t *testing.T) {
 		slotID := uuid.NewString()
 		socialDemoID := uuid.NewString()
 
-		err := storage.AddClickEvent(bannerID, slotID, socialDemoID)
+		err := storage.AddClickEvent(bannerID, slotID, socialDemoID, "")
 		require.NoError(t, err, "should be without errors")
 
 		var click ClickDB
@@ -204,7 +204,7 @@ func TestStorage(t *testing.T) {
 		slotID := uuid.NewString()
 		socialDemoID := uuid.NewString()
 
-		err := storage.AddViewEvent(bannerID, slotID, socialDemoID)
+		err := storage.AddViewEvent(bannerID, slotID, socialDemoID, "")
 		require.NoError(t, err, "should be without errors")
 
 		var view ViewDB

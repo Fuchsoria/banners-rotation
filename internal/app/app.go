@@ -1,14 +1,19 @@
 package app
 
 import (
+	"fmt"
+	"time"
+
+	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
 	sqlstorage "github.com/Fuchsoria/banners-rotation/internal/storage/sql"
 	"go.uber.org/zap"
 )
 
 type App struct {
-	logger  Logger
-	storage Storage
-	bandit  Bandit
+	logger   Logger
+	storage  Storage
+	bandit   Bandit
+	producer Producer
 }
 
 type Logger interface {
@@ -22,8 +27,8 @@ type Logger interface {
 type Storage interface {
 	AddBannerRotation(bannerID string, slotID string) error
 	RemoveBannerRotation(bannerID string, slotID string) error
-	AddClickEvent(bannerID string, slotID string, socialDemoID string) error
-	AddViewEvent(bannerID string, slotID string, socialDemoID string) error
+	AddClickEvent(bannerID string, slotID string, socialDemoID string, date string) error
+	AddViewEvent(bannerID string, slotID string, socialDemoID string, date string) error
 	GetNotViewedBanners(slotID string) ([]sqlstorage.NotViewedItem, error)
 	GetBannersClicks(slotID string) ([]sqlstorage.ClickItem, error)
 	GetBannersViews(slotID string) ([]sqlstorage.ViewItem, error)
@@ -33,12 +38,16 @@ type Storage interface {
 	CreateSocialDemo(ID string, description string) (string, error)
 }
 
+type Producer interface {
+	Publish(message simpleproducer.AMQPMessage) error
+}
+
 type Bandit interface {
 	Use(items []string, clicks map[string]int, views map[string]int) (string, error)
 }
 
-func New(logger Logger, storage Storage, bandit Bandit) *App {
-	return &App{logger, storage, bandit}
+func New(logger Logger, storage Storage, bandit Bandit, producer Producer) *App {
+	return &App{logger, storage, bandit, producer}
 }
 
 func (a *App) GetLogger() Logger {
@@ -54,11 +63,35 @@ func (a *App) RemoveBannerRotation(bannerID string, slotID string) error {
 }
 
 func (a *App) AddClickEvent(bannerID string, slotID string, socialDemoID string) error {
-	return a.storage.AddClickEvent(bannerID, slotID, socialDemoID)
+	date := time.Now().String()
+
+	err := a.storage.AddClickEvent(bannerID, slotID, socialDemoID, date)
+	if err != nil {
+		return fmt.Errorf("cannot create banner click event, %w", err)
+	}
+
+	err = a.producer.Publish(simpleproducer.AMQPMessage{Type: "click", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
+	if err != nil {
+		return fmt.Errorf("cannot publish banner click, %w", err)
+	}
+
+	return nil
 }
 
 func (a *App) AddViewEvent(bannerID string, slotID string, socialDemoID string) error {
-	return a.storage.AddViewEvent(bannerID, slotID, socialDemoID)
+	date := time.Now().String()
+
+	err := a.storage.AddViewEvent(bannerID, slotID, socialDemoID, date)
+	if err != nil {
+		return fmt.Errorf("cannot create banner view event, %w", err)
+	}
+
+	err = a.producer.Publish(simpleproducer.AMQPMessage{Type: "view", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
+	if err != nil {
+		return fmt.Errorf("cannot publish banner click, %w", err)
+	}
+
+	return nil
 }
 
 func (a *App) MapDataFromDB(

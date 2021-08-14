@@ -4,19 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
-	simpleproducer "github.com/Fuchsoria/banners-rotation/internal/amqp/producer"
 	"github.com/jmoiron/sqlx"
 )
 
-type Producer interface {
-	Publish(message simpleproducer.AMQPMessage) error
-}
-
 type Storage struct {
-	db       *sqlx.DB
-	producer Producer
+	db *sqlx.DB
 }
 
 type BannerRotationItem struct {
@@ -45,13 +38,13 @@ type NotViewedItem struct {
 
 var ErrBannersWereRemoved = errors.New("banners were not removed from rotation")
 
-func New(ctx context.Context, connectionString string, producer Producer) (*Storage, error) {
+func New(ctx context.Context, connectionString string) (*Storage, error) {
 	db, err := sqlx.ConnectContext(ctx, "postgres", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open db, %w", err)
 	}
 
-	return &Storage{db, producer}, nil
+	return &Storage{db}, nil
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
@@ -93,31 +86,19 @@ func (s *Storage) RemoveBannerRotation(bannerID string, slotID string) error {
 	return nil
 }
 
-func (s *Storage) AddClickEvent(bannerID string, slotID string, socialDemoID string) error {
-	date := time.Now().String()
+func (s *Storage) AddClickEvent(bannerID string, slotID string, socialDemoID string, date string) error {
 	_, err := s.db.Exec("INSERT INTO clicks (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
 		return fmt.Errorf("cannot insert banner click, %w", err)
 	}
 
-	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "click", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
-	if err != nil {
-		return fmt.Errorf("cannot publish banner click, %w", err)
-	}
-
 	return nil
 }
 
-func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID string) error {
-	date := time.Now().String()
+func (s *Storage) AddViewEvent(bannerID string, slotID string, socialDemoID string, date string) error {
 	_, err := s.db.Exec("INSERT INTO views (slot_id,banner_id,social_demo_id,date) VALUES ($1,$2,$3,$4)", slotID, bannerID, socialDemoID, date)
 	if err != nil {
 		return fmt.Errorf("cannot insert banner view, %w", err)
-	}
-
-	err = s.producer.Publish(simpleproducer.AMQPMessage{Type: "view", SlotID: slotID, BannerID: bannerID, SocialDemoID: socialDemoID, Date: date})
-	if err != nil {
-		return fmt.Errorf("cannot publish banner click, %w", err)
 	}
 
 	return nil
